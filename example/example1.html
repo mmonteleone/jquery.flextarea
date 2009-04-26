@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>jQuery.flextarea Example</title>
+    <style type="text/css" media="screen">
+    textarea {
+        width: 300px;
+        border: 1px solid #BBB;
+        padding: 10px;
+        font-size: 20px;
+        font-weight: bold;
+        font-family: helvetica, arial, sans-serif;
+    }    
+    </style>
+    <script src="../lib/jquery-1.3.2.min.js" type="text/javascript" charset="utf-8"></script>  
+    <script src="../jquery.flextarea.js" type="text/javascript" charset="utf-8"></script>  
+    <script type="text/javascript" charset="utf-8">
+    $(function(){
+
+        // set up all textareas to get processed by flextarea
+        // this is a shortcut for $('selector').flextarea(options)
+        $.flextarea();
+
+    });
+    </script>
+</head>
+<body>
+    <h1>jQuery.flextarea Examples</h1>
+    <form>
+        <p>Using HTML5 attributes to specify min and max rows</p>
+        <textarea data-minrows="2" data-maxrows="5">asdlfjas dlfj 
+asdlfjasdlkfjasd</textarea><br />
+        <textarea data-minrows="10" data-maxrows="20">asdlfjas</textarea><br />
+        <textarea data-minrows="1" data-maxrows="4"></textarea><br />
+    </form>
+
+</body>
+</html>
