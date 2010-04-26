@@ -35,8 +35,12 @@ task :build => [:clean] do
   # copy documentation
   cp 'README.markdown', 'dist/README.markdown'
   
+  # copy examples
+  cp 'example/example1.html', 'dist/example/example1.html'
+
   # copy lib
   cp 'lib/jquery-1.4.2.min.js', 'dist/lib/jquery-1.4.2.min.js'
+  cp 'lib/jquery.confine.min.js', 'dist/lib/jquery.confine.min.js'
   cp 'lib/GPL-LICENSE.txt', 'dist/lib/GPL-LICENSE.txt'
   cp 'lib/MIT-LICENSE.txt', 'dist/lib/MIT-LICENSE.txt'
   

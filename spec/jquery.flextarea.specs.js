@@ -19,6 +19,8 @@ QUnit.specify("jQuery.flextarea", function() {
         // test runner
         var $ = window.$,
             jQuery = window.jQuery;
+        var is14OrGreater = Number($.fn.jquery.split('.').slice(0,2).join('.')) >= 1.4;
+        var binderMethod = is14OrGreater ? 'live' : 'bind';
 
         var fakeGlobal = {
             setTimeout: DeLorean.setTimeout
@@ -94,6 +96,13 @@ QUnit.specify("jQuery.flextarea", function() {
                 it("it should have a value of 'textarea' for selector", function(){
                     assert($.fn.flextarea.defaults.selector).equals('textarea');
                 });
+                it("should have proper live setting (true if >= 1.4)", function(){
+                    if(is14OrGreater) {
+                        assert($.fn.flextarea.defaults.live).isTrue("should be true");
+                    } else {
+                        assert($.fn.flextarea.defaults.live).isFalse("should be false");                        
+                    }                
+                });                
             });
             
             it("it should use data-minheight html5 attribute over option when present", function(){
@@ -150,7 +159,51 @@ QUnit.specify("jQuery.flextarea", function() {
                 FormBuilder.clear();    
             });
             
-          
+            it("should throw an exception when specifying live when jq version doesn't support (<1.4 only)", function(){
+                if(is14OrGreater) {
+                    try{
+                        $('textarea').flextarea({live:true});
+                        assert.pass();
+                    } catch(e) {
+                        assert.fail('should have allowed live when 1.4');
+                    }
+                } else {
+                    assert(function(){
+                        $('textarea').flextarea({live:true});
+                    }).throwsException('Use of the live option requires jQuery 1.4 or greater');
+                }                
+            });     
+            
+            if(is14OrGreater) {                
+                it("should register paste, keydown, change, maxlength with live when live specified as true", function(){
+                    var originalLive = $.fn.live;
+                    try {
+                        var calls = [];
+                        $.fn.live = function(eventName) {
+                            calls.push(eventName);
+                            return this;
+                        };
+                        $('textarea').flextarea({live:true});                        
+                        assert(calls).isSameAs(['keydown','change','paste','maxlength']);
+                    } finally {
+                        $.fn.live = originalLive;
+                    }
+                });
+            }
+            it("should register paste, keydown, change, maxlength with bind when live specified as false", function(){
+                var originalBind = $.fn.bind;
+                try {
+                    var calls = [];
+                    $.fn.bind = function(eventName) {
+                        calls.push(eventName);
+                        return this;
+                    };
+                    $('textarea').flextarea({live:false});
+                    assert(calls).isSameAs(['keydown','change','paste','maxlength']);
+                } finally {
+                    $.fn.bind = originalBind;
+                }                    
+            });                   
             
             describe("when using minHeight", function(){
                 it("it should size to min when text is less than min", function(){
@@ -360,6 +413,40 @@ QUnit.specify("jQuery.flextarea", function() {
                 });
             });            
         });
+        if(is14OrGreater) {
+            describe("when used with live", function(){
+                after(function(){
+                    FormBuilder.clear();                    
+                });
+                
+                it("should still resize textareas added after activation", function(){
+                    var events=[];
+                    // bind first
+                    $('textarea')
+                        .flextarea({global:fakeGlobal})
+                        .live('resize', function(){
+                            events.push(this);                                                                                    
+                        });
+                        
+                    // then add textareas
+                    FormBuilder.addTextArea('t1','abcd');
+                    FormBuilder.addTextArea('t2','abcd');
+                    FormBuilder.addTextArea('t3','abcd');
+                    
+                    // type too much in all 3 newly added textareas
+                    $('textarea#t1,textarea#t2,textarea#t3')
+                        .css({height:'20px'})
+                        .autotype('a{{enter}}b{{enter}}c{{enter}}d{{enter}}e');
+                    
+                    DeLorean.advance(20);
+                        
+                    assert(events.length).equals(3);
+                    assert($('textarea#t1').height()).isGreaterThan(100);
+                    assert($('textarea#t2').height()).isGreaterThan(100);
+                    assert($('textarea#t3').height()).isGreaterThan(100);
+                });
+            });            
+        }        
     };
     
     /**
@@ -378,8 +465,9 @@ QUnit.specify("jQuery.flextarea", function() {
      * of jquery.
      * 
      * Assumes they have each been loaded and set to notConflict(true)
+     * aliased as jq14, jq13, etc.
      */
-    each(["1.3.2"], function(version) {
+    each(["1.3.2","1.4.1","1.4.2"], function(version) {
         describe("in jQ " + version, function(){
             $ = jQuery = window['jq_' + version.replace(/\./g,'_')];
             specification();                    
