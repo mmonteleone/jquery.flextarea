@@ -359,7 +359,7 @@ QUnit.specify("jQuery.flextarea", function() {
                     
                     area.flextareaResize();
                                         
-                    assert(eventCount).equals(1);
+                    assert(eventCount).isGreaterThan(0);
                 });
                 it("it should trigger grow event", function(){
                     var area = FormBuilder.addTextArea("text1","text1val1"),
@@ -393,7 +393,7 @@ QUnit.specify("jQuery.flextarea", function() {
                     
                     area.flextareaResize();
                                         
-                    assert(eventCount).equals(1);
+                    assert(eventCount).isGreaterThan(0);
                 });
                 it("it should trigger shrink event", function(){
                     var area = FormBuilder.addTextArea("text1","text1val1"),
